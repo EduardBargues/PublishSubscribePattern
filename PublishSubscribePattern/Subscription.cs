@@ -1,9 +1,7 @@
 ﻿using System;
 
-namespace PublishSubscribePattern
-{
-    public class Subscription
-    {
+namespace PublishSubscribePattern {
+    public class Subscription {
         readonly object handler;
 
         /// <summary>
@@ -24,8 +22,7 @@ namespace PublishSubscribePattern
         /// <param name="action">Action.</param>
         /// <param name="id">Identifier.</param>
         /// <param name="eventType">Event type.</param>
-        public Subscription (object action, Guid id, Type eventType)
-        {
+        public Subscription ( object action , Guid id , Type eventType ) {
             handler = action;
             Id = id;
             EventType = eventType;
@@ -36,11 +33,9 @@ namespace PublishSubscribePattern
         /// </summary>
         /// <param name="message">Message.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void Handle<T> (T message)
-        {
-            if (handler is Action<T> action)
-            {
-                action (message);
+        public void Handle<T> ( T message ) {
+            if ( handler is Action<T> action ) {
+                action ( message );
             }
         }
     }

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
 
 using PublishSubscribePattern;
 
 namespace Tests.PublishSubscriberPattern {
     internal class DummyEventsBroker : EventsBroker {
-        internal List<Subscription> Subscriptions => subscriptions;
+        internal ConcurrentDictionary<Guid , Subscription> Subscriptions => subscriptions;
     }
 }
