@@ -12,20 +12,25 @@ namespace PublishSubscribePattern {
 
         public Guid SubscribeTo<T> ( Action<T> action ) {
             Subscription subscription = new Subscription ( action , Guid.NewGuid ( ) , typeof ( T ) );
-            subscriptions.TryAdd ( subscription.Id , subscription );
-            return subscription.Id;
+            bool ok = subscriptions.TryAdd ( subscription.Id , subscription );
+            return ok ? subscription.Id : Guid.Empty;
         }
-        public Guid SubscribeGeneral ( Action<object> action ) {
+
+        public Guid SubscribeToAll ( Action<object> action ) {
             Subscription subscription = new Subscription ( action , Guid.NewGuid ( ) , typeof ( object ) );
-            generalSubscriptions.TryAdd ( subscription.Id , subscription );
-            return subscription.Id;
+            bool ok = generalSubscriptions.TryAdd ( subscription.Id , subscription );
+            return ok ? subscription.Id : Guid.Empty;
         }
-        public bool IsSubscribed ( Guid id ) => generalSubscriptions.Keys.Any ( k => k == id ) ||
-                    subscriptions.Keys.Any ( k => k == id );
-        public void Unsubscribe ( Guid id ) {
-            generalSubscriptions.TryRemove ( id , out Subscription _ );
-            subscriptions.TryRemove ( id , out Subscription _ );
+
+        public bool IsSubscribed ( Guid id ) => generalSubscriptions.ContainsKey ( id ) ||
+                    subscriptions.ContainsKey ( id );
+
+        public bool Unsubscribe ( Guid id ) {
+            bool ok = generalSubscriptions.TryRemove ( id , out Subscription _ ) ||
+                subscriptions.TryRemove ( id , out Subscription _ );
+            return ok;
         }
+
         public void Publish<T> ( T message , bool asParallel = false ) {
             void Action ( Subscription s ) {
                 if ( generalSubscriptions.ContainsKey ( s.Id ) ) {
@@ -45,6 +50,7 @@ namespace PublishSubscribePattern {
                 subs.ForEach ( Action );
             }
         }
+
         public void ClearSubscriptions ( ) {
             generalSubscriptions.Clear ( );
             subscriptions.Clear ( );

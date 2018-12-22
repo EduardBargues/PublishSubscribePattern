@@ -9,7 +9,6 @@ namespace PublishSubscribePattern {
         /// </summary>
         /// <value>The identifier.</value>
         public Guid Id { get; }
-
         /// <summary>
         /// Gets the type of the event to subscribe to.
         /// </summary>

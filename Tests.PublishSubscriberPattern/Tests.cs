@@ -8,7 +8,7 @@ namespace Tests.PublishSubscriberPattern {
     [TestFixture]
     public class Tests {
         [Test]
-        public void PublishInSequence_SubscribersReceiveEvent ( ) {
+        public void Publish_AsParallelFalse_SubscribersReceiveEvent ( ) {
             // Arrange
             int n = 0;
             void F ( string message ) {
@@ -27,7 +27,7 @@ namespace Tests.PublishSubscriberPattern {
             Assert.AreEqual ( 4 , n );
         }
         [Test]
-        public void PublishInParallel_SubscribersReceiveEvent ( ) {
+        public void Publish_AsParallelTrue_SubscribersReceiveEvent ( ) {
             // Arrange
             int n = 0;
             object mutex = new object ( );
@@ -49,12 +49,64 @@ namespace Tests.PublishSubscriberPattern {
             Assert.AreEqual ( 4 , n );
         }
         [Test]
+        public void Publish_AsParallelFalse_GeneralSubscribersReceiveEvent ( ) {
+            // Arrange
+            int n = 0;
+            void F ( object message ) {
+                n++;
+            }
+            EventsBroker publisher = new EventsBroker ( );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+
+            // Act
+            publisher.Publish ( "hey!" );
+
+            // Assert
+            Assert.AreEqual ( 4 , n );
+        }
+        [Test]
+        public void Publish_AsParallelTrue_GeneralSubscribersReceiveEvent ( ) {
+            // Arrange
+            int n = 0;
+            object mutex = new object ( );
+            void F ( object message ) {
+                lock ( mutex ) {
+                    n++;
+                }
+            }
+            EventsBroker publisher = new EventsBroker ( );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+            publisher.SubscribeToAll ( F );
+
+            // Act
+            publisher.Publish ( "hey!" , asParallel: true );
+
+            // Assert
+            Assert.AreEqual ( 4 , n );
+        }
+        [Test]
         public void SubscribeTo_SubscriptionsStoreAction ( ) {
             // Arrange
             DummyEventsBroker broker = new DummyEventsBroker ( );
 
             // Act
             Guid id = broker.SubscribeTo<string> ( null );
+
+            // Assert
+            Assert.IsTrue ( broker.IsSubscribed ( id ) );
+        }
+        [Test]
+        public void SubscribeToAll_GeneralSubscriptionsStoreAction ( ) {
+            // Arrange
+            DummyEventsBroker broker = new DummyEventsBroker ( );
+
+            // Act
+            Guid id = broker.SubscribeToAll ( null );
 
             // Assert
             Assert.IsTrue ( broker.IsSubscribed ( id ) );
@@ -67,6 +119,18 @@ namespace Tests.PublishSubscriberPattern {
 
             // Act
             broker.Subscriptions.TryAdd ( id , new Subscription ( null , id , typeof ( string ) ) );
+
+            // Assert
+            Assert.IsTrue ( broker.IsSubscribed ( id ) );
+        }
+        [Test]
+        public void IsSubscribed_GeneralSubscriptionHasAction_ReturnsTrue ( ) {
+            // Arrange
+            DummyEventsBroker broker = new DummyEventsBroker ( );
+            Guid id = Guid.NewGuid ( );
+
+            // Act
+            broker.GeneralSubscriptions.TryAdd ( id , new Subscription ( null , id , typeof ( string ) ) );
 
             // Assert
             Assert.IsTrue ( broker.IsSubscribed ( id ) );
@@ -94,11 +158,24 @@ namespace Tests.PublishSubscriberPattern {
             Assert.IsFalse ( broker.IsSubscribed ( id ) );
         }
         [Test]
+        public void Unsubscribe_GeneralSubscriptionHadAction_ActionRemoved ( ) {
+            // Arrange
+            DummyEventsBroker broker = new DummyEventsBroker ( );
+            Guid id = broker.SubscribeToAll ( null );
+            Assert.IsTrue ( broker.IsSubscribed ( id ) );
+
+            // Act
+            broker.Unsubscribe ( id );
+
+            // Assert
+            Assert.IsFalse ( broker.IsSubscribed ( id ) );
+        }
+        [Test]
         public void ClearSubscriptions_SubscriptionHadManyActions_AllActionsRemoved ( ) {
             // Arrange
             DummyEventsBroker broker = new DummyEventsBroker ( );
             Guid id1 = broker.SubscribeTo<string> ( null );
-            Guid id2 = broker.SubscribeTo<string> ( null );
+            Guid id2 = broker.SubscribeToAll ( null );
             Assert.IsTrue ( broker.IsSubscribed ( id1 ) );
             Assert.IsTrue ( broker.IsSubscribed ( id2 ) );
 
@@ -107,6 +184,7 @@ namespace Tests.PublishSubscriberPattern {
 
             // Assert
             Assert.IsEmpty ( broker.Subscriptions );
+            Assert.IsEmpty ( broker.GeneralSubscriptions );
         }
     }
 }
