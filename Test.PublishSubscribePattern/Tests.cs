@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 using PublishSubscribePattern;
 
-namespace Tests.PublishSubscriberPattern {
+namespace Test.PublishSubscribePattern {
     [TestFixture]
     public class Tests {
         [Test]
@@ -24,7 +24,7 @@ namespace Tests.PublishSubscriberPattern {
             publisher.Publish ( "hey!" );
 
             // Assert
-            Assert.AreEqual ( 4 , n );
+            Assert.AreEqual ( 4, n );
         }
         [Test]
         public void Publish_AsParallelTrue_SubscribersReceiveEvent ( ) {
@@ -43,10 +43,10 @@ namespace Tests.PublishSubscriberPattern {
             publisher.SubscribeTo<string> ( F );
 
             // Act
-            publisher.Publish ( "hey!" , asParallel: true );
+            publisher.Publish ( "hey!", asParallel: true );
 
             // Assert
-            Assert.AreEqual ( 4 , n );
+            Assert.AreEqual ( 4, n );
         }
         [Test]
         public void Publish_AsParallelFalse_GeneralSubscribersReceiveEvent ( ) {
@@ -65,7 +65,7 @@ namespace Tests.PublishSubscriberPattern {
             publisher.Publish ( "hey!" );
 
             // Assert
-            Assert.AreEqual ( 4 , n );
+            Assert.AreEqual ( 4, n );
         }
         [Test]
         public void Publish_AsParallelTrue_GeneralSubscribersReceiveEvent ( ) {
@@ -84,10 +84,10 @@ namespace Tests.PublishSubscriberPattern {
             publisher.SubscribeToAll ( F );
 
             // Act
-            publisher.Publish ( "hey!" , asParallel: true );
+            publisher.Publish ( "hey!", asParallel: true );
 
             // Assert
-            Assert.AreEqual ( 4 , n );
+            Assert.AreEqual ( 4, n );
         }
         [Test]
         public void SubscribeTo_SubscriptionsStoreAction ( ) {
@@ -118,7 +118,7 @@ namespace Tests.PublishSubscriberPattern {
             Guid id = Guid.NewGuid ( );
 
             // Act
-            broker.Subscriptions.TryAdd ( id , new Subscription ( null , id , typeof ( string ) ) );
+            broker.Subscriptions.TryAdd ( id, new Subscription ( null, id, typeof ( string ) ) );
 
             // Assert
             Assert.IsTrue ( broker.IsSubscribed ( id ) );
@@ -130,7 +130,7 @@ namespace Tests.PublishSubscriberPattern {
             Guid id = Guid.NewGuid ( );
 
             // Act
-            broker.GeneralSubscriptions.TryAdd ( id , new Subscription ( null , id , typeof ( string ) ) );
+            broker.GeneralSubscriptions.TryAdd ( id, new Subscription ( null, id, typeof ( string ) ) );
 
             // Assert
             Assert.IsTrue ( broker.IsSubscribed ( id ) );
