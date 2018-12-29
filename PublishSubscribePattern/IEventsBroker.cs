@@ -3,47 +3,44 @@
 namespace PublishSubscribePattern {
     public interface IEventsBroker {
         /// <summary>
-        /// Subscribes to an specific event type. If it can not subscribe, the returned Guid will be empty.
+        /// Subscribe to a certain message type T with an action to be done once the message is launched.
+        /// It returns a Guid Id to uniquely identify the subscription.
         /// </summary>
-        /// <returns>The to.</returns>
-        /// <param name="action">Action.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
         Guid SubscribeTo<T> ( Action<T> action );
-
         /// <summary>
-        /// Subscribes to all events. Useful for log things. If it can not subscribe, the returned Guid will be empty.
+        /// Adds a subscription that will be launched for every published message.
+        /// Useful when you want to add a log action to monitor every message.
         /// </summary>
-        /// <returns>The general.</returns>
-        /// <param name="action">Action.</param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         Guid SubscribeToAll ( Action<object> action );
-
         /// <summary>
-        /// Checks if the events broker has a subscription defined by the id.
+        /// Checks in the general subscriptions and standard subscriptions if a subscription is present 
+        /// based on it's id.
         /// </summary>
-        /// <returns>The subscribed.</returns>
-        /// <param name="id">Identifier.</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool IsSubscribed ( Guid id );
-
         /// <summary>
-        /// Unsubscribe the specified id.
+        /// Remove the subscription based on it's id.
         /// </summary>
-        /// <returns>The unsubscribe.</returns>
-        /// <param name="id">Identifier.</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool Unsubscribe ( Guid id );
-
         /// <summary>
-        /// Publishes the specified event.
+        /// Publishes a message and launches the subscription sequentially by default.
+        /// They can also be launched in parallel using the input asParallel.
         /// </summary>
-        /// <returns>The publish.</returns>
-        /// <param name="message">Message.</param>
-        /// <param name="asParallel">If set to <c>true</c> as parallel.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        void Publish<T> ( T message , bool asParallel = false );
-
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="asParallel"></param>
+        void Publish<T> ( T message, bool asParallel = false );
         /// <summary>
-        /// Clears the subscriptions.
+        /// Removes all subscriptions.
         /// </summary>
-        /// <returns>The subscriptions.</returns>
         void ClearSubscriptions ( );
     }
 }
