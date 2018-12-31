@@ -5,7 +5,6 @@ I add some tests to see how the library works. If you find anything that might n
 
 ```c#
 [Test]
-      [Test]
 public void Publish_AsParallelFalse_SubscribersReceiveEvent ( ) {
     // Arrange
     int n = 0;
