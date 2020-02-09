@@ -19,10 +19,10 @@ namespace PublishSubscribePattern
         /// <param name="action">Action.</param>
         /// <param name="id">Identifier.</param>
         /// <param name="eventType">Event type.</param>
-        internal Subscription(object action, Type eventType)
+        internal Subscription(object action, Type type)
         {
             handler = action;
-            EventType = eventType;
+            EventType = type;
         }
 
         /// <summary>
@@ -34,8 +34,6 @@ namespace PublishSubscribePattern
         {
             if (handler is Func<T, Task> func)
                 await func(message).ConfigureAwait(false);
-            if (handler is Action<T> action)
-                action(message);
         }
     }
 }

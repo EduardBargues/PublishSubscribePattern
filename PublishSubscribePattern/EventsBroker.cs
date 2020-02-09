@@ -19,22 +19,10 @@ namespace PublishSubscribePattern
         public EventsBroker(ILogger<EventsBroker> logger) => this.logger = logger;
 
         /// <inheritdoc/>
-        public async Task<Guid> SubscribeTo<T>(Action<T> action, string channelName = ChannelName.Default)
+        public async Task<Guid> SubscribeTo<T>(Func<T, Task> func, string channelName = ChannelName.Default)
         {
             Channel channel = GetOrAddChannel(channelName);
-            Subscription subscription = new Subscription(action, typeof(T));
-            Guid id = await channel.Subscribe(subscription).ConfigureAwait(false);
-
-            logger?.LogInformation($"Synchronous subscription {id} on type {typeof(T).Name} added.");
-
-            return id;
-        }
-
-        /// <inheritdoc/>
-        public async Task<Guid> SubscribeTo<T>(Func<T, Task> action, string channelName = ChannelName.Default)
-        {
-            Channel channel = GetOrAddChannel(channelName);
-            Subscription subscription = new Subscription(action, typeof(T));
+            Subscription subscription = new Subscription(func, typeof(T));
             Guid id = await channel.Subscribe(subscription).ConfigureAwait(false);
 
             logger?.LogInformation($"Asynchronous subscription {id} on type {typeof(T).Name} added.");

@@ -13,23 +13,16 @@ namespace PublishSubscribePattern.Tests
         {
             // Arrange
             int n = 0;
-            void F(string message) => n++;
+            Task F(string message) { n++; return Task.CompletedTask; };
             EventsBroker publisher = new EventsBroker(logger: null);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
+            for (int i = 0; i < 10; i++)
+                await publisher.SubscribeTo<string>(F);
 
             // Act
             await publisher.Publish("hey!");
 
             // Assert
-            Assert.Equal(9, n);
+            Assert.Equal(10, n);
         }
 
         [Fact]
@@ -48,16 +41,8 @@ namespace PublishSubscribePattern.Tests
             }
 
             EventsBroker publisher = new EventsBroker(logger: null);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
+            for (int i = 0; i < 10; i++)
+                await publisher.SubscribeTo<string>(F);
 
             // Act
             await publisher.Publish("hey!");
@@ -82,16 +67,9 @@ namespace PublishSubscribePattern.Tests
             }
 
             EventsBroker publisher = new EventsBroker(logger: null);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
-            await publisher.SubscribeTo<string>(F);
+            for (int i = 0; i < 10; i++)
+                await publisher.SubscribeTo<string>(F);
+
 
             // Act
             await publisher.Publish("hey!", asParallel: true);
@@ -134,8 +112,8 @@ namespace PublishSubscribePattern.Tests
             EventsBroker broker = new EventsBroker(null);
             bool channel1Activated = false;
             bool channel2Activated = false;
-            await broker.SubscribeTo<string>(str => channel1Activated = true, "channel 1");
-            await broker.SubscribeTo<string>(str => channel2Activated = true, "channel 2");
+            await broker.SubscribeTo<string>(str => { channel1Activated = true; return Task.CompletedTask; }, "channel 1");
+            await broker.SubscribeTo<string>(str => { channel2Activated = true; return Task.CompletedTask; }, "channel 2");
 
             // Act
             await broker.Publish("Activate", "channel 1");
@@ -152,8 +130,8 @@ namespace PublishSubscribePattern.Tests
             EventsBroker broker = new EventsBroker(null);
             bool integerTypeSubscriptionActivated = false;
             bool stringTypeSubscriptionActivated = false;
-            await broker.SubscribeTo<string>(str => stringTypeSubscriptionActivated = true);
-            await broker.SubscribeTo<int>(str => integerTypeSubscriptionActivated = true);
+            await broker.SubscribeTo<string>(str => { stringTypeSubscriptionActivated = true; return Task.CompletedTask; });
+            await broker.SubscribeTo<int>(str => { integerTypeSubscriptionActivated = true; return Task.CompletedTask; });
 
             // Act
             await broker.Publish(1);
@@ -164,10 +142,10 @@ namespace PublishSubscribePattern.Tests
         }
 
         [Fact]
-        public async Task asdf()
+        public async Task Publish_AsPArallelVsStandardApproachComparison()
         {
             // Arrange
-            async Task F(string message) => await Task.Delay(1000);
+            static async Task F(string message) => await Task.Delay(1000);
             EventsBroker publisher = new EventsBroker(logger: null);
             for (int i = 0; i < 10; i++)
                 await publisher.SubscribeTo<string>(F);

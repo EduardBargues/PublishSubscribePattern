@@ -8,15 +8,6 @@ namespace PublishSubscribePattern.Contracts
     public interface IEventsBroker
     {
         /// <summary>
-        /// Subscribe to a certain message type T with an action to be done once the message is launched.
-        /// It returns a Guid Id to uniquely identify the subscription.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        Task<Guid> SubscribeTo<T>(Action<T> action, string channelName = ChannelName.Default);
-
-        /// <summary>
         /// Subscribe to a certain message type T with a function to be done once the message is launched.
         /// It returns a Guid Id to uniquely identify the subscription.
         /// </summary>
