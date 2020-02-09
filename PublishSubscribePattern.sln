@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern", "PublishSubscribePattern\PublishSubscribePattern.csproj", "{66411593-87FD-4DF3-BF92-5A223B9A8F1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishSubscribePattern.Contracts", "PublishSubscribePattern.Contracts\PublishSubscribePattern.Contracts.csproj", "{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern.Contracts", "PublishSubscribePattern.Contracts\PublishSubscribePattern.Contracts.csproj", "{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishSubscribePattern.Tests", "PublishSubscribePattern.Tests\PublishSubscribePattern.Tests.csproj", "{635441BA-33DB-453E-8BF4-60D81B260502}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublisherSubscribePattern.Test", "PublisherSubscribePattern.Test\PublisherSubscribePattern.Test.csproj", "{160E6371-4571-4FB6-A014-298260244078}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}.Release|Any CPU.Build.0 = Release|Any CPU
-		{635441BA-33DB-453E-8BF4-60D81B260502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{635441BA-33DB-453E-8BF4-60D81B260502}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{635441BA-33DB-453E-8BF4-60D81B260502}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{635441BA-33DB-453E-8BF4-60D81B260502}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160E6371-4571-4FB6-A014-298260244078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160E6371-4571-4FB6-A014-298260244078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160E6371-4571-4FB6-A014-298260244078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160E6371-4571-4FB6-A014-298260244078}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
