@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern.Contracts", "PublishSubscribePattern.Contracts\PublishSubscribePattern.Contracts.csproj", "{3FA79616-884B-4C56-A6AF-D4E8CEE6EF03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern.Test", "PublisherSubscribePattern.Test\PublishSubscribePattern.Test.csproj", "{160E6371-4571-4FB6-A014-298260244078}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishSubscribePattern.Test", "PublishSubscribePattern.Test\PublishSubscribePattern.Test.csproj", "{160E6371-4571-4FB6-A014-298260244078}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
