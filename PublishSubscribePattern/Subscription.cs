@@ -1,14 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
-namespace PublishSubscribePattern {
-    public class Subscription {
+namespace PublishSubscribePattern
+{
+    public class Subscription
+    {
         readonly object handler;
 
-        /// <summary>
-        /// Gets the identifier of the subscription.
-        /// </summary>
-        /// <value>The identifier.</value>
-        public Guid Id { get; }
         /// <summary>
         /// Gets the type of the event to subscribe to.
         /// </summary>
@@ -16,14 +14,14 @@ namespace PublishSubscribePattern {
         public Type EventType { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:PublishSubscribePattern.Subscription"/> class.
+        /// Initializes a new instance of the <see cref="Subscription"/> class.
         /// </summary>
         /// <param name="action">Action.</param>
         /// <param name="id">Identifier.</param>
         /// <param name="eventType">Event type.</param>
-        public Subscription ( object action , Guid id , Type eventType ) {
+        internal Subscription(object action, Type eventType)
+        {
             handler = action;
-            Id = id;
             EventType = eventType;
         }
 
@@ -32,10 +30,12 @@ namespace PublishSubscribePattern {
         /// </summary>
         /// <param name="message">Message.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void Handle<T> ( T message ) {
-            if ( handler is Action<T> action ) {
-                action ( message );
-            }
+        public async Task Handle<T>(T message)
+        {
+            if (handler is Func<T, Task> func)
+                await func(message).ConfigureAwait(false);
+            if (handler is Action<T> action)
+                action(message);
         }
     }
 }
