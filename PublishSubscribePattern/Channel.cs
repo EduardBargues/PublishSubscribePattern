@@ -14,6 +14,11 @@ namespace PublishSubscribePattern
         readonly Dictionary<Guid, Subscription> subscriptionsById = new Dictionary<Guid, Subscription>();
         private readonly AsyncLock door = new AsyncLock();
 
+        internal Channel()
+        {
+
+        }
+
         public async Task<Guid> Subscribe(Subscription subscription)
         {
             using (await door.LockAsync())

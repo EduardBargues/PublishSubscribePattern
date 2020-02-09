@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>PublishSubscribePattern</PackageId>
     <Description>Compact, simple and powerful asynchronous .net standard library for events bus (also know as subscribe/publish events pattern)</Description>
@@ -12,8 +12,8 @@
     <PackageProjectUrl>https://github.com/EduardBargues/PublishSubscribePattern</PackageProjectUrl>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>2.0.0</Version>
-    <PackageReleaseNotes>Capability to manage several channels to publish messages. Channels are thread independant so they don't block each others.</PackageReleaseNotes>
+    <Version>2.0.2</Version>
+    <PackageReleaseNotes>Solve with constracts dependencies that blocked the installation of the package.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +28,6 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
     <PackageReference Include="morelinq" Version="3.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PublishSubscribePattern.Contracts\PublishSubscribePattern.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

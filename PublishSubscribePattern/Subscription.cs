@@ -25,6 +25,11 @@ namespace PublishSubscribePattern
             EventType = type;
         }
 
+        internal Subscription()
+        {
+
+        }
+
         /// <summary>
         /// Handle the specified event/message.
         /// </summary>
