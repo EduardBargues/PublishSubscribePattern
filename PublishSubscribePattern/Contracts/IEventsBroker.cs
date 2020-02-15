@@ -25,10 +25,10 @@ namespace PublishSubscribePattern.Contracts
         Task<bool> Unsubscribe(Guid id, string channelName = ChannelName.Default);
 
         /// <summary>
-        /// Publishes a message on a channel and launches the subscriptions sequentially.
+        /// Publishes a message on a channel and enqueues it to be processed.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
-        Task Publish<T>(T message, string channelName = ChannelName.Default, bool asParallel = false);
+        Task Publish<T>(T message, string channelName = ChannelName.Default);
     }
 }

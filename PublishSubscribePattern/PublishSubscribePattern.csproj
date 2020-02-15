@@ -26,8 +26,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
+    <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="morelinq" Version="3.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
   </ItemGroup>
 
 </Project>

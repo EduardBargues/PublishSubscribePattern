@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace PublishSubscribePattern
 {
-    public class Subscription
+    internal class Subscription
     {
         readonly object handler;
 
@@ -23,11 +23,6 @@ namespace PublishSubscribePattern
         {
             handler = action;
             EventType = type;
-        }
-
-        internal Subscription()
-        {
-
         }
 
         /// <summary>

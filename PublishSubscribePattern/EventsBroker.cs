@@ -11,46 +11,36 @@ using PublishSubscribePattern.Contracts;
 
 namespace PublishSubscribePattern
 {
-    public class EventsBroker : IEventsBroker
+    internal class EventsBroker : IEventsBroker
     {
-        private readonly ConcurrentDictionary<string, Channel> channelsByName = new ConcurrentDictionary<string, Channel>();
-        private readonly ILogger<EventsBroker> logger;
+        readonly IChannelFactory channelFactory;
 
-        public EventsBroker(ILogger<EventsBroker> logger) => this.logger = logger;
+        public EventsBroker(IChannelFactory channelFactory)
+        {
+            this.channelFactory = Guard.Argument(channelFactory, nameof(channelFactory)).NotNull().Value;
+        }
 
         /// <inheritdoc/>
         public async Task<Guid> SubscribeTo<T>(Func<T, Task> func, string channelName = ChannelName.Default)
         {
-            Channel channel = GetOrAddChannel(channelName);
+            Channel channel = await channelFactory.GetChannel(channelName).ConfigureAwait(false);
             Subscription subscription = new Subscription(func, typeof(T));
             Guid id = await channel.Subscribe(subscription).ConfigureAwait(false);
-
-            logger?.LogInformation($"Asynchronous subscription {id} on type {typeof(T).Name} added.");
-
             return id;
         }
 
         /// <inheritdoc/>
         public async Task<bool> Unsubscribe(Guid id, string channelName = ChannelName.Default)
         {
-            Channel channel = GetOrAddChannel(channelName);
-            bool ok = await channel.Unsubscribe(id).ConfigureAwait(false);
-
-            if (ok) logger?.LogInformation($"Subscription {id} removed.");
-            else logger?.LogWarning($"Failed to remove subscription {id}.");
-
-            return ok;
+            Channel channel = await channelFactory.GetChannel(channelName).ConfigureAwait(false);
+            return await channel.Unsubscribe(id).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public async Task Publish<T>(T message, string channelName = ChannelName.Default, bool asParallel = false)
+        public async Task Publish<T>(T message, string channelName = ChannelName.Default)
         {
-            logger?.LogInformation($"Publishing message {message} ...");
-
-            Channel channel = GetOrAddChannel(channelName);
-            await channel.Publish(message, asParallel).ConfigureAwait(false);
+            Channel channel = await channelFactory.GetChannel(channelName).ConfigureAwait(false);
+            await channel.Publish(message).ConfigureAwait(false);
         }
-
-        private Channel GetOrAddChannel(string channelName) => channelsByName.GetOrAdd(channelName, new Channel());
     }
 }
