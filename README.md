@@ -4,183 +4,161 @@ Lightweight, compact and simple publish-subscribe events bus.
 I add some tests to see how the library works. If you find anything that might need improvements, please let me know :) !!
 
 ```c#
-[Test]
-public void Publish_AsParallelFalse_SubscribersReceiveEvent ( ) {
+[Fact]
+public async Task Publish_SynchronousSubscribersListenning_SubscribersReceiveEvent()
+{
     // Arrange
     int n = 0;
-    void F ( string message ) {
-        n++;
-    }
-    EventsBroker publisher = new EventsBroker ( );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
+    Task F(string message) { n++; return Task.CompletedTask; };
+    EventsBroker publisher = new EventsBroker(logger: null);
+    for (int i = 0; i < 10; i++)
+        await publisher.SubscribeTo<string>(F);
 
     // Act
-    publisher.Publish ( "hey!" );
+    await publisher.Publish("hey!");
 
     // Assert
-    Assert.AreEqual ( 4, n );
+    Assert.Equal(10, n);
 }
-[Test]
-public void Publish_AsParallelTrue_SubscribersReceiveEvent ( ) {
+
+[Fact]
+public async Task Publish_AsynchronousSubscribersListenning_SubscribersReceiveEvent()
+{
     // Arrange
     int n = 0;
-    object mutex = new object ( );
-    void F ( string message ) {
-        lock ( mutex ) {
+    AsyncLock door = new AsyncLock();
+    async Task F(string message)
+    {
+        using (await door.LockAsync())
+        {
+            await Task.Delay(10 * new Random().Next(0, 10));
             n++;
         }
     }
-    EventsBroker publisher = new EventsBroker ( );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
-    publisher.SubscribeTo<string> ( F );
+
+    EventsBroker publisher = new EventsBroker(logger: null);
+    for (int i = 0; i < 10; i++)
+        await publisher.SubscribeTo<string>(F);
 
     // Act
-    publisher.Publish ( "hey!", asParallel: true );
+    await publisher.Publish("hey!");
 
     // Assert
-    Assert.AreEqual ( 4, n );
+    Assert.Equal(10, n);
 }
-[Test]
-public void Publish_AsParallelFalse_GeneralSubscribersReceiveEvent ( ) {
+
+[Fact]
+public async Task PublishAsPArallel_AsynchronousSubscribersListenning_SubscribersReceiveEvent()
+{
     // Arrange
     int n = 0;
-    void F ( object message ) {
-        n++;
-    }
-    EventsBroker publisher = new EventsBroker ( );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
-
-    // Act
-    publisher.Publish ( "hey!" );
-
-    // Assert
-    Assert.AreEqual ( 4, n );
-}
-[Test]
-public void Publish_AsParallelTrue_GeneralSubscribersReceiveEvent ( ) {
-    // Arrange
-    int n = 0;
-    object mutex = new object ( );
-    void F ( object message ) {
-        lock ( mutex ) {
+    AsyncLock door = new AsyncLock();
+    async Task F(string message)
+    {
+        using (await door.LockAsync())
+        {
+            await Task.Delay(10);
             n++;
         }
     }
-    EventsBroker publisher = new EventsBroker ( );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
-    publisher.SubscribeToAll ( F );
+
+    EventsBroker publisher = new EventsBroker(logger: null);
+    for (int i = 0; i < 10; i++)
+        await publisher.SubscribeTo<string>(F);
+
 
     // Act
-    publisher.Publish ( "hey!", asParallel: true );
+    await publisher.Publish("hey!", asParallel: true);
 
     // Assert
-    Assert.AreEqual ( 4, n );
+    Assert.Equal(10, n);
 }
-[Test]
-public void SubscribeTo_SubscriptionsStoreAction ( ) {
+
+[Fact]
+public async Task UnsubscribeTo_SubscriptionPreviouslyAdded_SubscriptionRemoved()
+{
     // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
+    EventsBroker broker = new EventsBroker(null);
+    Guid id = await broker.SubscribeTo<string>(null);
 
     // Act
-    Guid id = broker.SubscribeTo<string> ( null );
+    bool ok = await broker.Unsubscribe(id);
 
     // Assert
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
+    Assert.True(ok);
 }
-[Test]
-public void SubscribeToAll_GeneralSubscriptionsStoreAction ( ) {
+
+[Fact]
+public async Task UnsubscribeTo_SubscriptionPreviouslyAdded_FalseReturned()
+{
     // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
+    EventsBroker broker = new EventsBroker(null);
 
     // Act
-    Guid id = broker.SubscribeToAll ( null );
+    bool ok = await broker.Unsubscribe(Guid.NewGuid());
 
     // Assert
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
+    Assert.False(ok);
 }
-[Test]
-public void IsSubscribed_SubscriptionHasAction_ReturnsTrue ( ) {
+
+[Fact]
+public async Task PublishInFirstChannel_SeveralActiveChannels_OnlySubscriptionsInFirstChannelActivated()
+{
     // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
-    Guid id = Guid.NewGuid ( );
+    EventsBroker broker = new EventsBroker(null);
+    bool channel1Activated = false;
+    bool channel2Activated = false;
+    await broker.SubscribeTo<string>(str => { channel1Activated = true; return Task.CompletedTask; }, "channel 1");
+    await broker.SubscribeTo<string>(str => { channel2Activated = true; return Task.CompletedTask; }, "channel 2");
 
     // Act
-    broker.Subscriptions.TryAdd ( id, new Subscription ( null, id, typeof ( string ) ) );
+    await broker.Publish("Activate", "channel 1");
 
     // Assert
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
+    Assert.True(channel1Activated);
+    Assert.False(channel2Activated);
 }
-[Test]
-public void IsSubscribed_GeneralSubscriptionHasAction_ReturnsTrue ( ) {
-    // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
-    Guid id = Guid.NewGuid ( );
+
+[Fact]
+public async Task PublishOneType_SeveralTypeSubscriptionsAdded_OnlySubscriptionOfPublishedTypeActivated()
+{
+    // Arrange 
+    EventsBroker broker = new EventsBroker(null);
+    bool integerTypeSubscriptionActivated = false;
+    bool stringTypeSubscriptionActivated = false;
+    await broker.SubscribeTo<string>(str => { stringTypeSubscriptionActivated = true; return Task.CompletedTask; });
+    await broker.SubscribeTo<int>(str => { integerTypeSubscriptionActivated = true; return Task.CompletedTask; });
 
     // Act
-    broker.GeneralSubscriptions.TryAdd ( id, new Subscription ( null, id, typeof ( string ) ) );
+    await broker.Publish(1);
 
     // Assert
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
+    Assert.True(integerTypeSubscriptionActivated);
+    Assert.False(stringTypeSubscriptionActivated);
 }
-[Test]
-public void IsSubscribed_SubscriptionHasNoAction_ReturnsFalse ( ) {
-    // Arrange
-    // Act
-    DummyEventsBroker broker = new DummyEventsBroker ( );
 
-    // Assert
-    Assert.IsFalse ( broker.IsSubscribed ( Guid.NewGuid ( ) ) );
-}
-[Test]
-public void Unsubscribe_SubscriptionHadAction_ActionRemoved ( ) {
+[Fact]
+public async Task Publish_AsPArallelVsStandardApproachComparison()
+{
     // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
-    Guid id = broker.SubscribeTo<string> ( null );
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
+    static async Task F(string message) => await Task.Delay(1000);
+    EventsBroker publisher = new EventsBroker(logger: null);
+    for (int i = 0; i < 10; i++)
+        await publisher.SubscribeTo<string>(F);
 
     // Act
-    broker.Unsubscribe ( id );
+    Stopwatch watch = new Stopwatch();
+    watch.Start();
+    await publisher.Publish("hey!", asParallel: true);
+    watch.Stop();
+    long millisecondsParallel = watch.ElapsedMilliseconds;
+    watch.Reset();
+    watch.Start();
+    await publisher.Publish("hey!", asParallel: false);
+    watch.Stop();
+    long milliseconds = watch.ElapsedMilliseconds;
 
     // Assert
-    Assert.IsFalse ( broker.IsSubscribed ( id ) );
-}
-[Test]
-public void Unsubscribe_GeneralSubscriptionHadAction_ActionRemoved ( ) {
-    // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
-    Guid id = broker.SubscribeToAll ( null );
-    Assert.IsTrue ( broker.IsSubscribed ( id ) );
-
-    // Act
-    broker.Unsubscribe ( id );
-
-    // Assert
-    Assert.IsFalse ( broker.IsSubscribed ( id ) );
-}
-[Test]
-public void ClearSubscriptions_SubscriptionHadManyActions_AllActionsRemoved ( ) {
-    // Arrange
-    DummyEventsBroker broker = new DummyEventsBroker ( );
-    Guid id1 = broker.SubscribeTo<string> ( null );
-    Guid id2 = broker.SubscribeToAll ( null );
-    Assert.IsTrue ( broker.IsSubscribed ( id1 ) );
-    Assert.IsTrue ( broker.IsSubscribed ( id2 ) );
-
-    // Act
-    broker.ClearSubscriptions ( );
-
-    // Assert
-    Assert.IsEmpty ( broker.Subscriptions );
-    Assert.IsEmpty ( broker.GeneralSubscriptions );
+    Assert.True(millisecondsParallel < milliseconds);
 }
 ```
