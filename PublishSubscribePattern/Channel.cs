@@ -11,23 +11,27 @@ using Nito.AsyncEx;
 
 namespace PublishSubscribePattern
 {
-    internal class Channel
+    internal class Channel : IChannel
     {
         readonly ILogger logger;
         readonly string channelName;
-        readonly Dictionary<Guid, Subscription> subscriptionsById;
-        readonly Scheduler scheduler;
+        protected readonly Dictionary<Guid, Subscription> subscriptionsById;
+        readonly IScheduler scheduler;
         readonly AsyncLock door = new AsyncLock();
 
-        public Channel(string channelName, ILogger logger)
+        public static IChannel NewChannel(string channelName, ILogger logger)
+            => new Channel(channelName, logger, new Scheduler($"Scheduler {channelName}", logger));
+
+        public Channel() { }
+        public Channel(string channelName, ILogger logger, IScheduler scheduler)
         {
             this.logger = Guard.Argument(logger, nameof(logger)).NotNull().Value;
             this.channelName = Guard.Argument(channelName, nameof(channelName))
                 .NotNull()
                 .NotEmpty().Value;
+            this.scheduler = Guard.Argument(scheduler, nameof(scheduler)).NotNull().Value;
             Log($"Creating channel.");
             subscriptionsById = new Dictionary<Guid, Subscription>();
-            scheduler = new Scheduler(channelName, logger);
             door = new AsyncLock();
         }
 
@@ -51,7 +55,7 @@ namespace PublishSubscribePattern
 
         public async Task Publish<T>(T message)
         {
-            Log("Publishing.");
+            Log($"Publishing {message}.");
             using (await door.LockAsync())
             {
                 List<Subscription> subscriptions = subscriptionsById.Values

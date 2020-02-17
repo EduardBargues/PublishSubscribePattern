@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace PublishSubscribePattern
 {
     internal interface IChannelFactory
     {
-        Task<Channel> GetChannel(string channelName);
+        IChannel GetChannel(string channelName);
     }
 }

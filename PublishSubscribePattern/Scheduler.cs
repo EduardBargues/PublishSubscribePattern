@@ -11,7 +11,7 @@ using Nito.AsyncEx;
 
 namespace PublishSubscribePattern
 {
-    internal class Scheduler
+    internal class Scheduler : IScheduler
     {
         readonly Queue<Func<Task>> tasks;
         readonly AsyncLock door;
@@ -65,15 +65,9 @@ namespace PublishSubscribePattern
         {
             using (await door.LockAsync())
             {
-                try
-                {
-                    Func<Task> task = tasks.Dequeue();
-                    return task;
-                }
-                catch (InvalidOperationException)
-                {
-                    return null;
-                }
+                return tasks.Any()
+                    ? tasks.Dequeue()
+                    : null;
             }
         }
 

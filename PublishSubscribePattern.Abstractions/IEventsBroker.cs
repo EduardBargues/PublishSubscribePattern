@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PublishSubscribePattern.Contracts
+namespace PublishSubscribePattern.Abstractions
 {
     public interface IEventsBroker
     {
@@ -14,7 +14,7 @@ namespace PublishSubscribePattern.Contracts
         /// <typeparam name="T"></typeparam>
         /// <param name="func"></param>
         /// <returns></returns>
-        Task<Guid> SubscribeTo<T>(Func<T, Task> func, string channelName = ChannelName.Default);
+        Task<Guid> Subscribe<T>(Func<T, Task> func, string channelName = ChannelName.Default);
 
         /// <summary>
         /// Remove the subscription based on it's id in the specified channel.

@@ -28,7 +28,7 @@ namespace WebApplication1
         {
             services
                 .AddLogging(cfg => cfg.AddConsole())
-                .AddEventsBroker()
+                .AddEventsBroker(conf => conf.ChannelNames = new List<string>() { "c1", "c2", "c3" })
                 .AddControllers();
         }
 
